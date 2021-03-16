@@ -11,20 +11,18 @@ ADD common/fonts/*.ttf /usr/share/fonts/truetype/noto/
 # add font conf for fonts orders
 ADD common/local.conf /etc/fonts/
 
+# install compiled portchecker
+COPY portchecker-linux-arm64 /usr/local/bin/pcheck
+
 RUN set -xe && \
         apt-get update && \
         # install postgres client
-        apt-get install -y --no-install-recommends apt-transport-https wget gnupg2 git bzip2 ca-certificates fontconfig && \
+        apt-get install -y --no-install-recommends phantomjs make python3 apt-transport-https wget gnupg2 git bzip2 ca-certificates fontconfig && \
         echo "deb http://apt.postgresql.org/pub/repos/apt/ ${DEBIAN_VERSION_NAME}-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
         wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
         apt-get update && \
         apt-get install -y --no-install-recommends postgresql-client-12 && \
         rm -rf /var/lib/apt/lists/* && \
-        # install pchecker
-        wget https://github.com/hackmdio/portchecker/releases/download/v1.0.5/portchecker-linux-amd64.tar.gz && \
-        tar xvf portchecker-linux-amd64.tar.gz -C /usr/local/bin && \
-        mv /usr/local/bin/portchecker-linux-amd64 /usr/local/bin/pcheck && \
-        rm portchecker-linux-amd64.tar.gz && \
         # Add user and groupd
         groupadd --gid $GID $USER_NAME && \
         useradd --uid $UID --gid $USER_NAME --no-log-init --create-home $USER_NAME && \
